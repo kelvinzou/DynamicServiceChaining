@@ -1,0 +1,269 @@
+\begin{thebibliography}{10}
+
+\bibitem{balance}
+{Balance}.
+\newblock \url{http://www.inlab.de/balance.html}.
+
+\bibitem{dpdk}
+{DPDK}.
+\newblock \url{http://dpdk.org/}.
+
+\bibitem{mip}
+{Mobile IP}.
+\newblock \url{https://tools.ietf.org/html/rfc3220}.
+
+\bibitem{Niagara}
+{Niagara}.
+\newblock Tech. rep.
+\newblock \url{http://www.cs.princeton.edu/research/techreps/TR-973-14}.
+
+\bibitem{prads}
+{PRADS}.
+\newblock \url{http://gamelinux.github.io/prads/}.
+
+\bibitem{snort}
+{Snort}.
+\newblock \url{https://www.snort.org/}.
+
+\bibitem{squid}
+squid.
+\newblock \url{http://www.squid-cache.org/Intro/}.
+
+\bibitem{bro}
+{The Bro Network Security Monitor}.
+\newblock \url{https://www.bro.org/}.
+
+\bibitem{tsqueezer}
+{Traffic Squeezer}.
+\newblock \url{http://www.trafficsqueezer.org/}.
+
+\bibitem{aho}
+{\sc Aho, A.~V., and Corasick, M.~J.}
+\newblock {Efficient string matching: an aid to bibliographic search}.
+\newblock {\em Communications of the ACM 18}, 6 (1975), 333--340.
+
+\bibitem{TCPProxy}
+{\sc Balakrishnan, H., Seshan, S., Amir, E., and Katz, R.~H.}
+\newblock {Improving TCP/IP Performance over Wireless Networks}.
+\newblock In {\em Proceedings of the 1st Annual International Conference on
+  Mobile Computing and Networking\/} (New York, NY, USA, 1995), MobiCom '95,
+  ACM, pp.~2--11.
+
+\bibitem{yaron}
+{\sc Bremler-Barr, A., Harchol, Y., Hay, D., and Koral, Y.}
+\newblock {Deep Packet Inspection as a Service}.
+\newblock In {\em CoNEXT\/} (Sydney, Australia, 2-5 December 2014).
+
+\bibitem{NAT}
+{\sc Egevang, K., and Francis, P.}
+\newblock The ip network address translator (nat).
+\newblock Tech. rep., RFC 1631, may, 1994.
+
+\bibitem{FLOWTAGS}
+{\sc Fayazbakhsh, S.~K., Chiang, L., Sekar, V., Yu, M., and Mogul, J.~C.}
+\newblock {Enforcing Network-Wide Policies in the Presence of Dynamic Middlebox
+  Actions using FlowTags}.
+\newblock In {\em 11th USENIX Symposium on Networked Systems Design and
+  Implementation (NSDI 14)\/} (Apr. 2014), USENIX Association, pp.~543--546.
+
+\bibitem{openvpn}
+{\sc Feilner, M.}
+\newblock {\em OpenVPN: Building and integrating virtual private networks}.
+\newblock Packt Publishing Ltd, 2006.
+
+\bibitem{OpenNF}
+{\sc Gember-Jacobson, A., Viswanathan, R., Prakash, C., Grandl, R., Khalid, J.,
+  Das, S., and Akella, A.}
+\newblock {OpenNF: Enabling Innovation in Network Function Control}.
+\newblock In {\em Proceedings of the 2014 ACM Conference on SIGCOMM\/} (2014),
+  SIGCOMM '14, ACM, pp.~163--174.
+
+\bibitem{SWAN}
+{\sc Hong, C.-Y., Kandula, S., Mahajan, R., Zhang, M., Gill, V., Nanduri, M.,
+  and Wattenhofer, R.}
+\newblock {Achieving High Utilization with Software-driven WAN}.
+\newblock In {\em Proceedings of the ACM SIGCOMM 2013 Conference on SIGCOMM\/}
+  (New York, NY, USA, 2013), SIGCOMM '13, ACM, pp.~15--26.
+
+\bibitem{softcell}
+{\sc Jin, X., Li, L.~E., Vanbever, L., and Rexford, J.}
+\newblock {SoftCell: Scalable and Flexible Cellular Core Network Architecture}.
+\newblock In {\em Proceedings of the Ninth ACM Conference on Emerging
+  Networking Experiments and Technologies\/} (New York, NY, USA, 2013), CoNEXT
+  '13, ACM, pp.~163--174.
+
+\bibitem{xinjin}
+{\sc Jin, X., Liu, H.~H., Gandhi, R., Kandula, S., Mahajan, R., Zhang, M.,
+  Rexford, J., and Wattenhofer, R.}
+\newblock {Dynamic Scheduling of Network Updates}.
+\newblock In {\em Proceedings of the 2014 ACM Conference on SIGCOMM\/} (2014),
+  SIGCOMM '14, ACM, pp.~539--550.
+
+\bibitem{ovs}
+{\sc Koponen, T., Amidon, K., Balland, P., Casado, M., Chanda, A., Fulton, B.,
+  Ganichev, I., Gross, J., Ingram, P., Jackson, E., Lambeth, A., Lenglet, R.,
+  Li, S.-H., Padmanabhan, A., Pettit, J., Pfaff, B., Ramanathan, R., Shenker,
+  S., Shieh, A., Stribling, J., Thakkar, P., Wendlandt, D., Yip, A., and Zhang,
+  R.}
+\newblock {Network Virtualization in Multi-tenant Datacenters}.
+\newblock In {\em 11th USENIX Symposium on Networked Systems Design and
+  Implementation (NSDI 14)\/} (Apr. 2014), USENIX Association, pp.~203--216.
+
+\bibitem{zUpdate}
+{\sc Liu, H.~H., Wu, X., Zhang, M., Yuan, L., Wattenhofer, R., and Maltz, D.}
+\newblock {zUpdate: Updating Data Center Networks with Zero Loss}.
+\newblock In {\em Proceedings of the ACM SIGCOMM 2013 Conference on SIGCOMM\/}
+  (New York, NY, USA, 2013), SIGCOMM '13, ACM, pp.~411--422.
+
+\bibitem{ratul}
+{\sc Mahajan, R., and Wattenhofer, R.}
+\newblock {On Consistent Updates in Software Deﬁned Networks}.
+\newblock In {\em 12th ACM Workshop on Hot Topics in Networks (HotNets),
+  College Park, Maryland\/} (November 2013).
+
+\bibitem{IPTABLES}
+{\sc Marmorstein, R., Kearns, P., and William, T.~C.}
+\newblock {An Open Source Solution for Testing NAT’d and Nested iptables
+  Firewalls}.
+\newblock In {\em 19th Large Installation Systems Administration Conference
+  (LISA ’05\/} (2005), pp.~103--112.
+
+\bibitem{ClickOS}
+{\sc Martins, J., Ahmed, M., Raiciu, C., Olteanu, V., Honda, M., Bifulco, R.,
+  and Huici, F.}
+\newblock {ClickOS and the Art of Network Function Virtualization}.
+\newblock In {\em 11th USENIX Symposium on Networked Systems Design and
+  Implementation (NSDI 14)\/} (Apr. 2014), USENIX Association, pp.~459--473.
+
+\bibitem{tcpdump}
+{\sc McCanne, S., and Jacobson, V.}
+\newblock The bsd packet filter: A new architecture for user-level packet
+  capture.
+\newblock In {\em Proceedings of the USENIX Winter 1993 Conference Proceedings
+  on USENIX Winter 1993 Conference Proceedings\/} (Berkeley, CA, USA, 1993),
+  USENIX'93, USENIX Association, pp.~2--2.
+
+\bibitem{openflow}
+{\sc McKeown, N., Anderson, T., Balakrishnan, H., Parulkar, G., Peterson, L.,
+  Rexford, J., Shenker, S., and Turner, J.}
+\newblock {OpenFlow: Enabling Innovation in Campus Networks}.
+\newblock {\em SIGCOMM Comput. Commun. Rev. 38}, 2 (Mar. 2008), 69--74.
+
+\bibitem{pyretic}
+{\sc Monsanto, C., Reich, J., Foster, N., Rexford, J., and Walker, D.}
+\newblock {Composing Software-defined Networks}.
+\newblock In {\em Proceedings of the 10th USENIX Conference on Networked
+  Systems Design and Implementation\/} (Berkeley, CA, USA, 2013), nsdi'13,
+  USENIX Association, pp.~1--14.
+
+\bibitem{click}
+{\sc Morris, R., Kohler, E., Jannotti, J., and Kaashoek, M.~F.}
+\newblock {The Click Modular Router}.
+\newblock In {\em Proceedings of the Seventeenth ACM Symposium on Operating
+  Systems Principles\/} (New York, NY, USA, 1999), SOSP '99, ACM, pp.~217--231.
+
+\bibitem{lisp}
+{\sc Natal, A.~R., Jakab, L., Portol{\'e}s, M., Ermagan, V., Natarajan, P.,
+  Maino, F., Meyer, D., and Aparicio, A.~C.}
+\newblock {LISP-MN: mobile networking through LISP}.
+\newblock {\em Wireless personal communications 70}, 1 (2013), 253--266.
+
+\bibitem{hip}
+{\sc Nikander, P., Gurtov, A., and Henderson, T.}
+\newblock {Host Identity Protocol (HIP): Connectivity, Mobility, Multi-Homing,
+  Security, and Privacy over IPv4 and IPv6 Networks}.
+\newblock {\em Communications Surveys Tutorials, IEEE 12}, 2 (Second 2010),
+  186--204.
+
+\bibitem{serval}
+{\sc Nordstr{\"o}m, E., Shue, D., Gopalan, P., Kiefer, R., Arye, M., Ko, S.,
+  Rexford, J., and Freedman, M.~J.}
+\newblock {Serval: An End-Host Stack for Service-Centric Networking}.
+\newblock In {\em Presented as part of the 9th USENIX Symposium on Networked
+  Systems Design and Implementation (NSDI 12)\/} (2012), USENIX, pp.~85--98.
+
+\bibitem{SIMPLE}
+{\sc Qazi, Z.~A., Tu, C.-C., Chiang, L., Miao, R., Sekar, V., and Yu, M.}
+\newblock {SIMPLE-fying Middlebox Policy Enforcement Using SDN}.
+\newblock In {\em Proceedings of the ACM SIGCOMM 2013 Conference on SIGCOMM\/}
+  (2013), SIGCOMM '13, ACM, pp.~27--38.
+
+\bibitem{MPTCP}
+{\sc Raiciu, C., Paasch, C., Barre, S., Ford, A., Honda, M., Duchene, F.,
+  Bonaventure, O., and Handley, M.}
+\newblock {How Hard Can It Be? Designing and Implementing a Deployable
+  Multipath TCP}.
+\newblock In {\em Presented as part of the 9th USENIX Symposium on Networked
+  Systems Design and Implementation (NSDI 12)\/} (2012), USENIX, pp.~399--412.
+
+\bibitem{HAMbox}
+{\sc Rajagopalan, S., Williams, D., and Jamjoom, H.}
+\newblock {Pico Replication: A High Availability Framework for Middleboxes}.
+\newblock In {\em Proceedings of the 4th Annual Symposium on Cloud Computing\/}
+  (New York, NY, USA, 2013), SOCC '13, ACM, pp.~1:1--1:15.
+
+\bibitem{splitmerge}
+{\sc Rajagopalan, S., Williams, D., Jamjoom, H., and Warfield, A.}
+\newblock {Split/Merge: System Support for Elastic Execution in Virtual
+  Middleboxes}.
+\newblock In {\em Presented as part of the 10th USENIX Symposium on Networked
+  Systems Design and Implementation (NSDI 13)\/} (2013), USENIX, pp.~227--240.
+
+\bibitem{consistentupdate}
+{\sc Reitblatt, M., Foster, N., Rexford, J., Schlesinger, C., and Walker, D.}
+\newblock {Abstractions for Network Update}.
+\newblock In {\em Proceedings of the ACM SIGCOMM 2012 Conference on
+  Applications, Technologies, Architectures, and Protocols for Computer
+  Communication\/} (2012), SIGCOMM '12, ACM, pp.~323--334.
+
+\bibitem{IPS}
+{\sc Scarfone, K., and Mell, P.}
+\newblock {Guide to intrusion detection and prevention systems (idps)}.
+\newblock {\em NIST special publication 800}, 2007 (2007), 94.
+
+\bibitem{COMB}
+{\sc Sekar, V., Egi, N., Ratnasamy, S., Reiter, M.~K., and Shi, G.}
+\newblock {Design and Implementation of a Consolidated Middlebox Architecture}.
+\newblock In {\em Presented as part of the 9th USENIX Symposium on Networked
+  Systems Design and Implementation (NSDI 12)\/} (2012), USENIX, pp.~323--336.
+
+\bibitem{Aplomb}
+{\sc Sherry, J., Hasan, S., Scott, C., Krishnamurthy, A., Ratnasamy, S., and
+  Sekar, V.}
+\newblock {Making Middleboxes Someone else's Problem: Network Processing As a
+  Cloud Service}.
+\newblock In {\em Proceedings of the ACM SIGCOMM 2012 Conference on
+  Applications, Technologies, Architectures, and Protocols for Computer
+  Communication\/} (New York, NY, USA, 2012), SIGCOMM '12, ACM, pp.~13--24.
+
+\bibitem{TCPMobile}
+{\sc Snoeren, A.~C., and Balakrishnan, H.}
+\newblock {An End-to-end Approach to Host Mobility}.
+\newblock In {\em Proceedings of the 6th Annual International Conference on
+  Mobile Computing and Networking\/} (2000), MobiCom '00, ACM, pp.~155--166.
+
+\bibitem{iperf}
+{\sc Tirumala, A., Qin, F., Dugan, J., Ferguson, J., and Gibbs, K.}
+\newblock Iperf: The tcp/udp bandwidth measurement tool.
+\newblock {\em htt p://dast. nlanr. net/Projects\/} (2005).
+
+\bibitem{DOA}
+{\sc Walfish, M., Stribling, J., Krohn, M., Balakrishnan, H., Morris, R., and
+  Shenker, S.}
+\newblock {Middleboxes No Longer Considered Harmful}.
+\newblock In {\em Proceedings of the 6th Conference on Symposium on Opearting
+  Systems Design and Implementation - Volume 6\/} (Berkeley, CA, USA, 2004),
+  OSDI'04, USENIX Association, pp.~15--15.
+
+\bibitem{zave}
+{\sc Zave, P., and Rexford, J.}
+\newblock {Compositional network mobility}.
+\newblock In {\em Verified Software: Theories, Tools, Experiments}. Springer,
+  2014, pp.~68--87.
+
+\bibitem{I3Mobile}
+{\sc Zhuang, S., Lai, K., Stoica, I., Katz, R., and Shenker, S.}
+\newblock {Host Mobility Using an Internet Indirection Infrastructure}.
+\newblock {\em Wirel. Netw. 11}, 6 (Nov. 2005), 741--756.
+
+\end{thebibliography}

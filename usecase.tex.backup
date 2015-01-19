@@ -1,0 +1,35 @@
+
+\section{Case Study}
+In the settings of enterprise network or cellular ISP, a single domain controls two of three parties at least, e.g., the clients and middleboxes or maybe servers are under the same administrative domain, it is important to support endpoint mobility and flexible middlebox policies. We study a few use cases here and show the significance of having a unified solution. 
+
+We focus on a few scenarios here: clients' mobility, middlebox insertion and removal, middlebox migration, and server migration.
+
+\textbf{Cellular Mobility and Middlebox:}
+In cellular networks, when a user equipment (UE) travels across different cells, it has to keep the same IP to keep the connection alive. LTE in particular, relies on a three tiered network of serving gateways (S-GWs), Packet Data Network Gateways (P-GWs) and Base Stations (BSs). P-GWs sit at the boundary of cellular network and the Internet and carry a few middlebox functionalities including content filtering, traffic optimization, and firewall, while S-GWs are used as mobility anchors to provide seamless mobility between BSs; three elements communicate using GPRS Tunneling Protocol (GTP). However, it suffers from flexibility: the client has to drop its IP when it is crossing different S-GW domains, and the middlebox function load cannot be easily balanced across different P-GWs or offloaded to S-GWs.
+
+\begin{figure}[ht]
+\centering
+% \includegraphics[scale=0.25]{figures/netfilter.pdf} 
+\includegraphics[width=\linewidth]{figures/softcellarch.pdf} 
+
+\caption{\small LTE network architecture\protect\cite{softcell}}
+\end{figure}
+
+\textbf{Middlebox Insertion and Removal}: Enterprise networks use intrusion prevention systems (IPSs) or packet scrubber to detect and filter the traffic. A static configured middlebox would sit at the choke point and inspect all the traffic. A slightly ``smarter'' solution would have a coarse-grained inspection first and if it detects some traffic suspicious and reshuffle the rules 
+
+
+ If we detect the traffic is suspicious, a routing solution would require a reshuffle of a few rules to direct one flow to IPS, or tunneling the traffic with high overhead. A session protocol based solution will direct the traffic to the middlebox without routing support at a low overhead.
+
+
+
+\textbf{Web Proxy} \textit{[removal]}:
+We should be able to dynamically remove a web proxy on the path. A flow may want to go to a cache proxy to check the content first, or go to performance enhancing proxy to open up congestion window~\cite{TCPProxy, squid}. Once the job is done (e.g., cache miss), the protocol actively signals the proxy "get out of the way".
+
+
+\textbf{Load Balancer} \textit{[removal]}: 
+We can fully take advantage of a software-based load balancer~\cite{Ananta} and achieve a dynamic removal of Middlebox for load balancing using Middlebox protocol. The client sends a request based on its destination IP, and then the load balancer signals back the client (or some middlebox in the middle) where the server is and then removes itself from the path.
+
+
+\textbf{Compression or transcoding} \textit{[replacement]}:
+If we need to compress or transcode some traffic (e.g., live video streaming) on the fly~\cite{transcoding}, and there are two transcoders to fulfill the functionality, we may want to split the traffic evenly. However if we need to re-balance the load on the fly, we may want to migrate the flow from one transcoder to another. 
+

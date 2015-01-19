@@ -1,0 +1,69 @@
+\section {Implementation}
+
+\subsection{Prototype}
+We have an in-kernel data plane and user space control/management plane via TCP/UDP sockets, with a total of about 4000 lines of code in C and C++. There are three different options (i) OS native network stack, (ii) NIC driver (e.g., DPDK~\cite{dpdk}) and (iii) customized in-kernel software switch (e.g., openvswitch~\cite{ovs}) for in-kernel implementation of data plane, . We choose option (i) due to (a) \system has to choose a right interface before sending to the driver when having multiple interfaces; and (b) customized in-kernel software switch has high overhead. We use kernel modules to register callback functions with Linux \texttt{netfilter} for data plane operation. The control/management plane has an extensible complex control logic, and the data plane does specific simple actions (e.g., header rewriting, queuing to packets user space and update kernel hash table). The user and the kernel agent communicate via a \texttt{netlink}, a native Linux inter-process communication (IPC) function. Currently the policy server is a simple TCP server that proactively pushes the policies to the agents. 
+
+\begin{figure}[ht]
+\centering
+% \includegraphics[scale=0.25]{figures/netfilter.pdf} 
+\includegraphics[width=\linewidth]{figures/archiIllustrrate.pdf} 
+
+\caption{\small Layout of the implementation blocks}\label{netf}
+\end{figure}
+
+
+
+
+
+\subsection{Network Function Support}
+
+We also investigated a wide range of network functions that can be integrated into \system. 
+
+There are two possible approaches to integrate network functions into the system: 
+\begin{enumerate}
+ \item \textbf{Restoring the packet header:} One way is to restore the packets' super-session header before directing the packets to a network function. It does not require NF change.
+ 
+ 
+ \item \textbf{Interacting the network function:} Another option is to pass the mapping between the sub-session and super-session to the network function, and the network function may also inform its own mapping to \system. It requires NF change.
+ 
+ 
+\end{enumerate}
+
+\begin{table}[t]\label{middleboxextension} 
+\centering
+ 
+\small
+\begin{tabular} {c |c |c |c}
+
+
+      Name          	  &         Type           & Key        	 &      Binding   \\
+                      	  &                        &  Functions          &       Library  \\ \hline
+Squid~\cite{squid} 	  &        Proxy           &  getsockopt()        & user socket  \\ \hline
+PRADS~\cite{prads}	  &      Monitoring        &    got\_packet()      & libpcap   \\ \hline
+Bro~\cite{bro}      	  &      IDS               &   DumpPacket()      & libpcap   \\ \hline
+Snort~\cite{snort}  	  &        IDS/IPS         &    PQ\_Show()          & libpcap \\ \hline
+Balance~\cite{balance}	  &      Load Balancer     &    recv(), writen()       &user socket\\ \hline
+Traffic   		  &    WAN-                &     net\_receive       &Linux  \\ 
+Squeezer ~\cite{tsqueezer}&Optimizer &\_skb()   & skbuff \\ 
+
+
+\end{tabular}
+\caption{\small Summary of Middleboxes that we need to modify to support middlebox session protocol }
+\end{table}
+
+There are two types of network functions --- active or passive functions --- based on whether it acts on the original packet.
+
+Network functions that do not act on the original packets, i.e., passive monitoring and IDS, mostly use libpcap~\cite{tcpdump} to get a clone of the original packet and decide based on the copy. Libpcap captures packets at PF\_PACKET, bypasses network stack, and sends the packet directly to user space. To support passive functions, we can extend libpcap without modifying network functions. 
+
+For active functions, if it only acts on the payload, header restoring also works. However, if the network function acts on the five tuples, it is necessary to modify the NF. One good example here would be a transparent cache proxy~\cite{squid}, where the proxy gets the packets from its listening port and set up a new TCP socket to the final destination. \system has to break the supersession into two if it does not know the mapping between two connections. On the other hand, if the NF and \system exchange the mapping, we can stitch the two connections and map them into one supersession. 
+
+
+% \subsection{Middlebox Support}
+
+
+
+
+% 
+%Three way handshake
+%read write lock
+%kmalloc atomic for faster access

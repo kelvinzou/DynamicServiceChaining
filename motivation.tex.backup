@@ -1,0 +1,53 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%Related work
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{comment}
+\begin{table*}[ht]\label{compare} 
+
+\small 
+
+\begin{tabular} {|l |c | c| c| c| c| c| c| }
+
+\hline
+
+                            			     &Scalable Fine-         & Supersession     & No Routing    	 &   Interdomain    &    Middlebox        &  Endpoint  &  No Application\\
+						     &Grained Control        & Liveness     	& Modification  	 &   Middlebox       &Migration       &  Mobility  & change \\\hline
+SIMPLE,FlowTags~\cite{SIMPLE,FLOWTAGS}        	   & $\oslash$             & $\oslash$   	& $\otimes$     	 &   $\oslash$      &    $\oslash$       &  $\otimes$   \\ \hline
+OpenNF,Split/Merge~\cite{OpenNF,splitmerge}         & $\otimes$             & $\odot$     	& $\otimes$     	 &   $\oslash$      &    $\odot$         &  $\otimes$  \\ \hline
+CoMB~\cite{CoMB}             & $\odot$               & $\odot$     	& $\odot$       	 &   $\otimes$        &    $\otimes$       &  $\otimes$ \\ \hline 
+DoA~\cite{DOA}               & $\otimes$             & $\odot$    	 & $\odot$     	 	  &   $\odot$        &    $\otimes$       &  $\otimes$  \\ \hline
+APLOMB~\cite{Aplomb}         & $\otimes$             & $\otimes$  	 & $\otimes$  	   	 &   $\odot$        &    $\odot$         &  $\otimes$ \\ \hline
+Software Routing~\cite{OVS, click} & $\odot$         & $\otimes$  	 & $\odot$      	  &   $\odot$        &    $\oslash$       &  $\otimes$  \\ \hline
+
+
+
+\end{tabular}
+\caption{\small Comparison between different middlebox traffic steering solutions and mobility protocols ($\odot$ indicates that a scheme fully supports the criterion; $\otimes$ indicates a scheme does not, $\oslash$ indicates partially support or can be extended to) }
+\end{table*}
+\end{comment}
+
+
+
+
+\section{Motivating Examples}
+
+In this section, we first present a few scenarios where a system may require network function (NF) insertion, removal, or migration, and host mobility. We also discuss how the current solutions fail to address our requirements. 
+
+% \subsection{Case Study}
+
+\subsection{Dynamic NF Policy}
+Enterprise networks deploy various network functions for a better performance and security. Dynamically inserting or removing an NF from a service chain improves the efficiency and flexibility of the network system. For example, intrusion detection and prevention systems (IDPSs~\cite{IPS}) are widely deployed in enterprise networks; if a flow is marked as suspicious by a low-overhead coarse-grained IDPS, it may ask for a high-overhead fine-grained deep packet inspection (DPI). Another example is a cache proxy. A connection goes through a cache proxy; once it returns a cache miss and the content is not cache-able, the cache proxy may remove itself out of the chain. 
+
+People cannot have efficient dynamic NF policy with conventional switches due to its coarse-grained routing, e.g., the switch may simply tunnel all the traffic to IDS for further inspection and remove IDS once find the ``needle'' in the ``haystack''. Some recent techniques leverage the fine-grained routing switch (e.g., OpenFlow~\cite{openflow} based in SDN) for dynamically changing NF policies. However, these solutions are neither scalable due to TCAM rule size, nor flexible due to a complex dependency between routing rules. 
+
+\subsection{Flow Migration across NF instances}
+Network function virtualization (NFV) makes resource more elastic: unlike conventional middleboxes where the NF runs on a specialized hardware, it can spin up (or down), scale out (or in) dynamically on generalized servers based on needs~\cite{splitmerge}. Given a NFV setting, it is important to enable a flexible flow migration across different NF instances for load balancing, hardware maintenance, or fault tolerance reason.  
+
+Many solutions rely on a centralized controller to manage both flow and NF state migration, however, it is clumsy to coordinate between the two. The controller plays an excessive role in data plane packet migration, while still fails to fulfill certain network order-preserving properties~\cite{splitmerge, OpenNF}.  
+
+\subsection{Mobility and NF Policy} 
+A cellular network can be divided into user equipment (UE), local access network (LAN) and core network.  LANs communicate to UEs through its base station and communicate to the Internet through the core network. Cellular networks rely on a wide range of NFs (e.g., firewall~\cite{IPTABLES}, load balancer~\cite{balance}, cache proxy~\cite{squid}) to improve performance and enhance security. As mobility and network function virtualization become ubiquitous, the network may ask for (i) seamless mobility and (ii) dynamic service chaining.
+
+Many mobility solutions have been proposed over the past years~\cite{mip, TCPMobile, I3Mobile, serval}, yet none of them consider the existence of network functions. What is worse, NFs can be a hindrance for these protocols since it may interfere with the protocol control logic (e.g., TCP split~\cite{TCPProxy}). People have proposed routing-based solution for service chaining in cellular network~\cite{softcell}. However, it places NFs only in the core network due to host mobility, and does not support dynamic service chaining. 
+
+

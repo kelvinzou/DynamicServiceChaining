@@ -1,0 +1,54 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%Related work
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%Comparison table %%%%%%%%%
+
+\begin{table*}[ht]\label{compare} 
+\centering
+\small 
+
+\begin{tabular} {l |c | c| c| c| c }
+
+
+                            			     &Scalable Fine-              &   Low Performance    &  NF's  Flow      &  Host        &  Incremental \\
+						     &Grained NF Policy    	  &   Overhead           & Migration       &  Mobility   & Deployment \\\hline
+						     
+NF Policy                                           & TCAM size,      	          &                      & not discussed      &   not discussed  & inter-domain  \\
+Enforcing~\cite{SIMPLE,FLOWTAGS}                   & TCAM update speed          &                      &                   &               &  middlebox \\ \hline
+
+
+NF Dynamic                                          &TCAM size,     	          &  Handle packets      &                &  not discussed    & inter-domain\\ 
+Control~\cite{OpenNF,splitmerge}                       &  TCAM update speed         & at the controller     &                &                & middlebox  \\   \hline
+
+
+Naming service                          &			  	 & VPN, or per packet encap-                   & not discussed       & not discussed &  [some] new naming system  \\ 
+based~\cite{DOA, Aplomb}                         &                              & sulate and identify          &                    &                  & new socket abstraction     \\\hline 
+
+
+
+\end{tabular}
+\caption{\small Reasons that different NF policy steering and mobility solutions failed to fulfill the properties}
+\end{table*}
+
+
+
+
+
+\section{Related work}
+
+\textbf{Middlebox in SDN:}
+SIMPLE~\cite{SIMPLE} and FlowTags~\cite{FLOWTAGS} take advantage of the switches with a fine-grained rule support in software-defined network (SDN), and support network function policy chaining in traditional and NFV setting respectively. Both approaches are constrained by the TCAM size, a hardware limitation in terms of fine-grained policy, and neither not support NF migration or host mobility. 
+
+OpenNF~\cite{OpenNF} and Split- Merge~\cite{splitmerge} leverage the SDN controller to manage NF's state migration and NF's flow migration. However, since the central controller is involved in both control plane (update the network rules) and data plane (buffer the packets on the fly during migration), they suffer from high latency and low scalability. They also suffer from hardware limitation for fine-grained policies.  
+
+\textbf{Middlebox using naming service:}
+DoA~\cite{DOA} uses a delegation-oriented global naming space architecture, that explicitly specifies intermediary middleboxes on the path. Two key distinction between DoA and \system is that (i) \system does not require any new naming service and (ii) DoA does not support dynamic policy service. APLOMB~\cite{Aplomb} outsources the network functions to the cloud with a naming service indirection. It uses VPN to tunnel the traffic to the cloud and use DNS-based indirection to decide which cloud to enforce the middlebox policy. It assumes the cloud can provide elastic NF service but it cannot explicitly handle dynamic policy chain. 
+
+
+\textbf{Middlebox consolidation:}
+CoMB~\cite{COMB} and click~\cite{ClickOS, click} both consolidate network functions as an application or a VM image, and one host machine can run multiple instances of different network functions. Both approaches are mainly focused a feasibility and scalability of network functions on a single generalized servers. Both solutions consider neither scale-out across servers nor NF and flow migration.
+
+\textbf{Mobility Protocols:}
+Mobility protocols use (i) a fixed indirection point (e.g., Mobile IP~\cite{mip}), (ii) redirecting through DNS (e.g., TCP Migrate~\cite{TCPMobile}), (iii) indirection infrastructure (e.g., ROAM~\cite{I3Mobile}) or (iv) indirection at the link layer (e.g., cellular mobility). None of them consider the existence of middleboxes. Coexistence of network functions and new protocols is especially important for deployment, as a study in multipath TCP shows~\cite{MPTCP}. \system shares some similarity with many mobility protocols and has support for network functions.   

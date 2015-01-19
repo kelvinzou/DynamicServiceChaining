@@ -1,0 +1,289 @@
+
+% archiIllustrrate
+\begin{comment}
+\begin{figure}[hb]
+\centering
+% \includegraphics[scale=0.25]{figures/netfilter.pdf} 
+\includegraphics[width=\linewidth]{figures/archiIllustrrate.pdf} 
+
+\caption{\small Middlebox protocol architecture}\label{expTopo}
+\end{figure}
+\end{comment}
+
+\section{Protocol}
+\label{sec:protocol}
+\begin{comment}
+We explain the basic indirection protocol in subsection~\ref{basic}, a three-way handshake that exchanges state enabling future migration in subsection~\ref{twoway}, and a migration protocol in subsection~\ref{mobile}. The middlebox-aware session protocol can: (i) successfully establish a connection through the two-way handshake; (ii) support a flexible migration of either endhosts or middleboxes; and (iii) gracefully close the connection, or sub-sessions during the migration. 
+\end{comment}
+
+Considering middleboxes as explicit components of the end-to-end between two endpoints is the crux of our protocol. Only by doing so can we achieve the desired scalability and flexibility for both endpoints and middleboxes. We discuss session setup in \S\ref{setup}  
+
+\subsection{Session setup}\label{setup}
+
+In \system protocol, each endpoint or middlebox sends packets whose destination is the next middlebox or endpoint in the session path. This obviates the need for special support in the switch or router to direct packets through the chosen chain of network functions (service chain), despite changes in network topology or host movement. 
+
+The list of middleboxes, $L$, that a flow has to traverse is provided by the policy server and can be pulled from the server or pushed to the client. When the client initiates the connection, the control plane uses a three-way handshake to establish the supersession and its associated subsessions. More specifically, the client's control plane sends a SYN message to the first middlebox that includes the supersession header and $L$. The middlebox strips itself from the head of $L$, gets the address of the next middlebox from $L$, and relays the rest of the message to the next middlebox. The SYN message is thus passed recursively through the elements of $L$ before reaching the server. Upon receiving the SYN, the server sends a SYNACK back to the client using $reverse(L)$. Upon receiving the SYNACK, the client immediately sends an ACK to the server via the same mechanism. Once these three control messages are exchanged, the supersession and subsessions are established, and data packets are explicitly addresses to the subsession IPs.
+
+If we simply rewrite the source and destination IPs, we lose supersession information and introduce ambiguity. Consider the case where flow a and b have the same source port and destination IP and port, but different source IPs. If a and b share the same first hop middlebox, the two flows may become indistinguishable upon arrival at the first hop middlebox. To address this issue, we modify the port number to identify the flow, a standard technique in NAT~\cite{NAT}. We integrate this port allocation into the three-way handshakea: port mappings are assigned in a middlebox when it receives a SYN, and relays the rewritten port numbers with the SYN to the next hop. If we rewrite both source and destination ports, per middlebox pair can have four billion unique flows.
+
+\begin{figure}[ht]
+\centering
+% \includegraphics[scale=0.25]{figures/netfilter.pdf} 
+\includegraphics[width=\linewidth]{figures/threeway.pdf} 
+
+\caption{\small  Session setup}\label{sessionsetup}
+\end{figure}
+
+
+
+\subsection{Migration and Mobility Control Logic}\label{MigrateLogic}
+%Dynamic network function policies are gaining ground today because of the flexibility they offer. 
+
+Supporting dynamic middlebox modification for a flow improves the efficiency of the network and NF use, e.g. --- removing a cache proxy if the content is not cache-able, inserting an IDS upon detecting suspicious flows, or switching from a heavily loaded transcoder to a lightly loaded one. As a natural extension of general middlebox migration, we also include endhost mobility in the design of \system; supporting mobility is also critical in cellular networks.
+
+\subsubsection{``Make before break''} \label{migration1}
+To find the right mechanism to support flow migration, we investigated existing mobility protocols~\cite{TCPMobile, I3Mobile, mip, serval, lisp, hip} under the session-location mobility framework~\cite{zave}. However, the key distinction between host mobility and NF flow migration is that a move in host mobility is unexpected, whereas flow migration among middleboxes is planned. 
+
+In fact, this type of reconfiguration is quite common in circuit design and addressed via the ``make before break'' philosophy. Namely, we stitch together subsessions on the new path before closing the subsessions on the old path. To achieve this, we treat the two neighbors of the moving middlebox as two \textit{signaling endpoints} during a flow migration. We stress that the resulting three nodes that are involved in the migration are \textit{consecutive}. Because we offload some policy decisions to the middleboxes, this property ensures that a middlebox cannot decide the fate of other on-path middleboxes that are not directly affected by the migration. 
+
+For a middlebox insertion, we first identify and notify one of the two \textit{signaling endpoints} as an initiating point in a deterministic way. We start from the initiating point, set the two \textit{signaling endpoints} in a suspend state for data transfer for the new path, and complete a three-way handshake (UPDATE-SYN, UPDATE-SYNACK and UPDATE-ACK) on a new path that includes the two \textit{signaling endpoints} and the new middlebox to insert, to ensure the path establishment. Once the new path is established, we start the data transfer on the new path and remove the old path. We extend the same mechanism to handle middlebox removal and replacement.
+
+\subsubsection{Handling Concurrent Migration}
+When we offload dynamic network function policy to a distributed control plane, we expect cases where two middleboxes initiate simultaneous move operations. In particular, if two neighbor middleboxes both initiate removal, we may lose the supersession connection. Strawman solutions include: (1) using a two phase commit to allow the one with the highest ID to move first; (2) a central controller that assigns token to the middleboxes. However, strong serialization via a two phase commit is not necessary, and a central controller suffers from scalability, thereby deviating from the initial design goal. We should furthermore allow concurrent moves at different points of the service chain. 
+
+To address concurrent migration, we rely on the following properties: (i) migration is per flow, and (ii) at most three nodes on the current service chain are involved in each flow migration. The two assumptions help us design an efficient system: migration can happen simultaneously for different flows, and concurrent migrations can happen at different points of the service chain if they involve disjoint sets of nodes; each node has a \texttt{pending} counter to ensure that it participates in at most one concurrent update.
+
+
+Middleboxes for a flow have a strict ordering, which is simply the order in which the middleboxes are traversed by the path from the client to the server. We can define two comparators on this ordering, which we term ``left'' and ``right''. $M_{1}$ is left of $M_{2}$ iff the path from the client to $M_{2}$ passes through $M_{1}$; $M_{1}$ is right of $M_{2}$ iff the path from the client to $M_{1}$ passes through $M_{2}$. The proposed algorithm only allows one concurrent operation for all the nodes involved. When a migration is initiated at a certain node, the node postpones the update if its \texttt{pending} counter is not zero, otherwise it increments the \texttt{pending} counter and sends the request to the node immediately to its left if the migration is removal or replacement, or connects to the new middlebox if it is an insertion. If the left side responds with a reject, the node backs off, otherwise it receives an approval and proceeds with the update. A node always accepts UPDATE-SYN requests (establishing a new path). See Algorithm~\ref{concurrency} for details.
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/concurrentupdate.pdf} 
+\caption{\small Flow migration during insert, remove and replace}\label{concurfigure}
+\end{figure}
+
+
+\begin{algorithm} [ht]
+%\small
+\scriptsize
+\SetAlgoLined
+
+\SetKwFunction{update}{Trigger\_Migration}\SetKwFunction{IPC}{Msg\_Handler }\SetKwFunction{queue}{Queue Agent}
+\SetKwProg{func}{Function}{}{}
+
+\func{\update{} } {
+\If{recv(migrate)}
+{
+  \If{pending == 0} {
+  pending++\;
+  \If{migration == insert }{
+    sendto(New right, UPDATE-SYN)\;
+   
+  } \Else{
+   sendto(Left, request)\;
+  }
+  }
+  \Else{
+  Exponentially backoff and retry\;
+  }
+}
+
+
+}
+\func{ \IPC{} }{
+\If{recv(request)}{
+  \If{pending$>0$ }{
+  sendback(reject)\;
+  }
+  \Else{
+  pending++ \;
+  sendto(New right, UPDATE-SYN)\;
+  sendback(approve)\;
+  }
+}
+
+\If{recv(reject) }{
+ Exponentially backoff and retry sendto(Left, request)\;
+}
+\If{recv(approve) }{
+//do nothing, to avoid request re-transmission
+}
+
+\If{recv(UPDATE-SYN)}
+{
+  pending++\;
+  \If{(migration==insert or replace) and (current == not signaling point) }{
+    forward(UPDATE-SYN)\;
+  }
+  \Else{
+  sendback(UPDATE-SYNACK)\;
+  } 
+  
+}
+\If{recv(close)}
+{
+  //clean old flow state\;
+  pending$--$\;
+}
+\If{recv(UPDATE-SYNACK)}{
+  pending$--$\;
+  \If{(migration==insert or replace) and (current == not signaling point) }{
+    forward(UPDATE-SYNACK)\;
+  }
+  \Else{
+  sendto(OldMBox, close)\;
+  sendback(UPDATE-ACK)\;
+    //clean old flow state\
+  } 
+  
+}
+\If{recv(UPDATE-ACK)}{
+  pending$--$\;
+   \If{(migration==insert or replace) and (current == not signaling point) }{
+    forward(UPDATE-ACK)\;
+  } \Else{
+    //clean old flow state\
+  }
+ 
+}
+
+}
+\caption{ Concurrent Flow Migration} \label{concurrency}
+
+\end{algorithm} 
+
+
+\subsubsection{``Break before make''}
+When a client moves, it may drop the old subsession before establishing a new subsession. Consider when a UE moves across a cell boundary, upon which the UE may suffer from transient connection loss, since it is out of the old cell's range. 
+
+After losing the old subsession, the client needs to rebind to the first hop middlebox. If we use the client's physical IP as part of the supersession identification, the first hop middlebox will fail to identify the supersession if the client changes its IP during mobility. To solve this problem, we can either put the old connection's information in the rebinding message sent by the client or, in a single domain case, administrators can assign a non-routeable IP to each device as a unique ID and use this ID to help identify the supersession. 
+
+\amy{I feel like this paragraph is unnecessary.}
+During mobility, if \system decides to preserve the old NF policy, we only need to rebind the client to the first middlebox and resume the supersession. However, \system may decide to update the NF policy for better security or performance, we can again apply flow migration mechanisms in \S\ref{migration1} to migrate the flow among middleboxes. 
+
+\subsection{Data Plane Properties}
+In this section, we show how our system design enables us to support a variety of desirable data plane properties.  
+
+\subsubsection{Loss-Free Update}
+
+%In the migration control logic, we have the concept of ``path''; let us now only focus on data plane and see how path is reflected there.
+
+At the data plane, there is a translation table stored in each middlebox. The table accepts flows for which it has established state, rewrites the header, and forwards the flow based on the supersession-subsession mapping. Moving a flow from one path to another is equivalent to updating the translation tables at the data plane to accept a flow from the new subsession(s) and reject the same flow from the old subsessions. Since there are multiple middleboxes involved in the update procedure, unless the updates on tables is atomic (which is impossible \amy{is this impossible or just unreasonably cumbersome and nonperformance; i think it is the latter, right?}), the update order matters. The translation layer may drop packets if the update happens in the wrong order, for example if the old subsession is removed before the new subsession is fully established.
+
+
+How to find the right sequence of updates for a general network is proven to be NP-complete~\cite{SWAN, zUpdate}, but for a special topology, linear in our setting (we only abstract the topology between middleboxes), we can apply the concept from network consistent update~\cite{consistentupdate, ratul}. We first ensure that the new translation rules are all pushed before the egress applies the new rule, and the old rules are not removed until all the new rules are installed. In particular, when a migration is initialized from the middlebox (a signaling point), it notifies its neighbor through the control plane, which inserts a new rule for incoming traffic. Then this neighbor notifies the other side of the connection with an UPDATE-SYN control message. Every hop that receives UPDATE-SYN updates its own translation table (two hops in insert and replace case, one hop in remove case). Hence once the other signaling endpoint receives the notification, a new rule for the flow has been installed at every hop for one direction of traffic; it is thus safe to apply the new rule for the egress. The opposite direction is set up via the same way from UPDATE-SYNACK. Once the new bidirectional path is built, we tear down the old path by removing the old rules. This loss-free update mechanism mirrors the control plane ``make before break'' philosophy and is in fact facilitated by the control plane design. 
+
+\subsubsection{Substream Separation}  
+
+When the flow is a byte stream at one direction (e.g., TCP), and we plan to migrate it from one IDS to another, we may want to ensure that all the SYNs and corresponding ACKs are going through the same IDS, otherwise, it may raise an alert like ``ACK before SYN''. To ensure this, we add one more feature in a loss-free update: we keep track of the TCP packets' max sequence number, and when an update happens, we use the max seen seq number as a \textit{checkpoint}, route all the packets with a lower seq number through the old path, and all packets with a higher seq number through the new path. This essentially creates two substreams on the old and the new path.
+
+We need to address two more TCP-specific issues: SYN-ACK piggyback and sequence number coalescing. In the first issue, if both directions ask for substream separation, we may get in a deadlock since \system may choose the new path for a substream with higher seq number at one direction and the old path for ACK as it is acking a substream with lower seq number at the reversed direction. In the second issue, a re-transmitted packet may coalesce the sequence number and thus the packet may cross the \textit{checkpoint} boundary. Both cases require a packet splitting in the data plane, e.g., separating SYN from ACK, splitting the data packet at the checkpoint. 
+
+
+ \begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/order_preserving.png} 
+
+\caption{\scriptsize We assume the migration starts at middlebox A, and the steps for an order-preserving update: 1. lock outgoing traffic; 2. send SYN packets; 3. lock the reverse direction traffic; 4. send SYNACK packets; 5. lock middlebox states; 6*. migrate states; 6. send SYNACK from old path; 7. finish migration and unlock states; 8. send SYNACK from new path; 9*. release buffered traffic; 9. send ACK packets; 10. release buffered traffic from the other side. } \label{orderpreserving} 
+\end{figure}
+ 
+\subsubsection{Packer Order Preserving} \label{FIFO}
+
+We may also migrate NF instance (state) from one physical middlebox to another during flow migration, a loss-free update fails to meet the need. More specifically, the NF state cannot be migrated since it is being continuously updated as packets are coming in via the old path. To lock and migrate the middlebox state, \system must stop sending traffic during the new path setup. Since changing the protocols' (e.g., TCP) flow control is undesirable, we choose to buffer the traffic and not to release it until the network function state on the old path's middlebox has been locked and replicated to the new path's middlebox. Figure~\ref{orderpreserving} describes the full details of the migration. Since NF state replication and migration is a well solved problem~\cite{OpenNF, splitmerge, HAMbox}, we do not address this problem here.  
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/opennfbroke.pdf} 
+\caption{ Order-preserving problem in OpenNF in a general setting}\label{opennfbroke}
+\end{figure}
+
+
+OpenNF defines \textbf{Order-Preserving} property as the following: \textit{All packets should be processed in the order they were forwarded to the NF instance by the switch (network)}. The update mechanism above is also order-preserving under the same assumption in OpenNF: the old path is FIFO, i.e., the notification message after the last data packet on the old path always comes after the last data packet to the old middlebox. Note neither OpenNF nor the mechanism in \S\ref{FIFO} is order preserving if the old path itself is not order preserving, as the example shows in Figure~\ref{opennfbroke}. 
+
+
+ 
+\subsubsection{Substream Separation and Order Preserving}  
+ 
+When \system migrates NF states, it may be beneficial to have a clean cut of byte stream (e.g., TCP flow) between the old and the new paths. Consider the case of deep packet inspection (DPI), both string matching and reg-exp matching builds a DFA/NFA first, and traverses from the root to certain state based on the data stream~\cite{aho, yaron}. If we want to use different DPI instances for a flow, and the first instance has not seen a complete substream, it can only check the largest continuous substream, buffer the rest of the data and send to the second instance both the DFA/NFA state and buffered data. 
+
+To freeze the traffic and support substream separation, the left neighbor of the moving point use the max seen seq number as a \textit{checkpoint}, and buffers the packets with a higher seq number than the checkpoint and forwards the packets with a lower seq number. We do not lock and migrate the old NF instance state until seeing an ACK at seq number \textit{checkpoint+1}. This guarantees the delivery of the packets at the old path since ACK is sent from an endpoint. Note this may create a reordering from the perspective of the left neighbor middlebox, however this is not a reordering from the perspective of endpoints. See Algorithm~\ref{strictorderpres} for details. 
+
+A combination of order preserving and substream separation provides us with a stronger order preserving during an update: \textit{Packets should be processed by different NF instances in the order they were forwarded from the sender}. The issue in Figure~\ref{opennfbroke} is also addressed since \system will not transmit packet 4 until \system sees an ACK for packet 3 at old NF instance C. We further observe that this property cannot be achieved in OpenNF, because of its implementation on the switches. Our protocol is able to provide this property precisely because the system architecture is designed to be aware of and rely on transport protocols.
+
+\begin{algorithm} [ht]
+\scriptsize
+\SetAlgoLined
+
+
+\SetKwFunction{syn}{recv\_SYN}\SetKwFunction{ack}{recv\_ACK}\SetKwFunction{queue}{release\_queue}
+\SetKwProg{mypacket}{Event\_Handler}{}{}
+\SetKwProg{func}{Program}{}{}
+
+\mypacket{\syn{packet p} } {
+checkpoint = hash\_lookup(p)\;
+\If{p.seq $<$ checkpoint} {
+Forward(p)\;
+} 
+\Else{Buffer (p)\;}
+} 
+
+
+
+
+\mypacket{\ack{packet p}}{
+\If{p.ack $>$checkpoint}{
+Migrate NF state\;
+sendto(left neighbor, release\_buffer)\;
+}
+}
+
+
+\mypacket{\queue{}}{
+\While{!buffer.empty()}{
+Forward(buffer.dequeue())\;
+}
+Reset(hash\_table)\;
+}
+
+
+
+\caption{Substream Separation and Order Preserving} \label{strictorderpres}
+
+
+\end{algorithm} 
+
+
+
+\begin{comment}
+
+
+There is one more issue here we need to address: since at the high traffic rate we can only queue packets in the user space, we have an issue of synchronization between the user space queue and kernel space flow. In figure~\ref{flowstream} step 3 and step 4 may be interleaved, which breaks the initial network semantics \amy{Still unclear to me how 3 and 4 can be interleaved.}. One solution is to keep the queue and enqueue all packets, however this severely penalizes the general case where the system is not in an update phase. To address this issue, we decide to take advantage of the spin\_lock for the hash table lookup, and lock the packet\_out interrupt if the user queue is not drained yet. A complete algorithm is in algorithm~\ref{sync}, and to add concurrency, we can have a flow to lock for each flow and add another lock lookup beforehand. 
+\end{comment}
+
+
+
+
+
+% In this section, we start with establishing a path with middlebox chain in \S~\ref{chain}, and explain adding, removing and replacing middleboxes in \S~\ref{migration}. We then introduce the layering for middleboxes in \S~\ref{layering},  and extend our protocol to work with endpoint mobility in \S~\ref{mobility}. 
+
+
+\begin{comment}
+\subsection{Layering for Middleboxes}\label{layering}
+
+One way to implement the above middlebox session protocol is to leverage TCP: use each TCP session to both adjacent neighbors, and stitch them together to create an end-to-end ``connection''. However, this requires substantial extensions to TCP; it also incurs the overhead of performing congestion control between each pair of adjacent endpoints. In addition, operations such as removing a middlebox (coalescing two TCP sessions into one) require handling many details such as sequence number and stream buffers. We argue that, similar to some mobility protocols~\cite{serval, hip}, a shim layer should be added between TCP and IP for better performance and greater flexibility. 
+
+A connection at the TCP layer is considered a super-session with a standard five tuple as a unique flow ID, whereas the connections underneath between each pair of adjacent points are considered as sub-sessions. Super-session/sub-session layering offers a better abstraction and enables flexible insertion, removal or replacement of middleboxes. Establishing a connection (super-session) is equivalent to setting up all sub-sessions. When middlebox insertion happens, we first create two new sub-sessions between the initial two \textit{signaling endpoints} and the middlebox to insert, and then send the packets via the new sub-sessions while keeping the super-session. We follow similar schemes to remove or replace middleboxes. 
+
+When the middlebox protocol runs in a shim layer, each pair of \textit{signaling endpoints} exchange control messages to establish and update connections. Like TCP, the control messages can piggyback the data messages. We can also use out-of-band UDP packets for information exchange. 
+
+\kelvin{Add the message header stuff here!}
+
+\subsection{Mobility and Middleboxes} \label{mobility}
+
+As we mentioned before, endpoint mobility can also be included under the same framework. Endpoint mobility often relies on some intermediate point with a flow ID to locator lookup to decide the next hop (e.g., destination or next hop router), examples including DNS server~\cite{DOA, TCPMobile},home agent~\cite{mip} and service router~\cite{serval}. Not surprisingly, the middleboxes can also be extended to support endpoint mobility. 
+
+To support endhost mobility, it needs one minor extension to the design in subsection~\ref{layering}. The super-session cannot depend on a (source IP, source port, dest IP, dest port, protocol) five tuple anymore because the source, dest or both IP might move. The key issue is identifying two connections with different five tuples as the same flow. The problem can be easily solved: for an enterprise network where devices are allocated by the corporation, or a cloud network where VM hosts' VIPs are assigned by the cloud provider, each device or VM can be assigned with a unique ID (UID). The super-session are distinguished by the UID and port numbers. Since the flow is identified by UID and port numbers, there is no change for the super-session even when the endhost moves, only one sub-session needs an update: the endhost actively binds to the first middlebox after moving, re-establishes the sub-session between the client and the first hop middlebox. \amy{Still a bit unclear how you are going to change the protocol. Do you not use the 5-tuple anymore?}
+
+\end{comment}

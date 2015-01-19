@@ -1,0 +1,64 @@
+
+\documentclass{sig-alternate-10pt}
+\usepackage{url}
+%\usepackage[protrusion=true,expansion=true]{microtype}  
+\usepackage{graphicx} 
+\usepackage{wrapfig} 
+\usepackage{amsmath}
+\usepackage{comment}
+\usepackage{cleveref}
+\usepackage{float}
+\usepackage{color}
+\usepackage[ruled,noend]{algorithm2e}
+\usepackage{footnote}
+\usepackage[font=small,labelfont=bf]{caption}
+
+\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\makesavenoteenv{tabular}
+\makesavenoteenv{table}
+\newcommand{\kelvin}[1]{\textcolor{blue}{(KELVIN: #1)}}
+\newcommand{\amy}[1]{\textcolor{red}{(AT: #1)}}
+
+\makeatletter
+
+
+\title{\LARGE\textbf{Rethinking How to Deploy In-Network Services}}
+
+\author{\textsc{ Tengyu Ma, Amy Tai, Kelvin Zou} % Author
+\\{\textit{Department of Computer Science, Princeton University}}} % Institution
+
+\begin{document}
+
+\maketitle  
+\begin{comment}
+\begin{abstract}
+In addition to delivering data efficiently, today's computer networks often perform services on the traffic in flight to provide new features, enhance security, privacy, or performance. Network administrators frequently install so-called ``middleboxes'' such as firewalls, network address translators, server load balancers, Web caches, and devices that compress or encrypt the traffic. Recent trends of Network Functions Virtualization (NFV) and Software Defined Networks (SDN) turn the network into a fungible pool of resource for running services and steering traffic. Based on a NFV setting, we propose an optimization solution. More specifically, we introduce and study a new class of multi-commodify flow problems where in addition to demands on flows and capacity constraints on edges, there is an additional requirement that flows be processed by middleboxes in the network. 
+
+Current techniques for getting middleboxes ``on path" rely on manipulating how the network switches route traffic. However due to flow session affinity and routing policy conflicts, tweaking the routing configuration to comply with a network is clumsy and inefficient. To achieve the routing solution we obtain from the optimization scheme, we propose a middlebox-aware session protocol (MBP) that makes middleboxes an explicit part of the end-to-end path, and adds, removes or replaces middleboxes dynamically as needed. This approach is easiest to achieve in a cloud environment, where---not coincidentally--the need for scalable NFV is greatest. 
+\end{abstract}
+
+\end{comment}
+
+
+\input{intro.tex}
+
+
+\input{relatedwork.tex}
+% \input{usecase.tex}
+\input{architecture.tex}
+
+\input{protocol.tex}
+\input{dynamic.tex}
+% \input{dataplane.tex}
+\input{implementation.tex}
+\input{evaluation.tex}
+
+
+\small
+\bibliographystyle{acm}
+
+\bibliography{ref}
+
+\end{document}
