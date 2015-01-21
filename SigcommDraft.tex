@@ -38,25 +38,25 @@
 \begin{abstract}
 
 
-  Middleboxes   are   at once  an   abomination   (a  violation of the
-  end-to-end argument)  and a   necessity (for deploying  higher-level
-  services between  endpoints).   Conventional techniques  for getting
+  Middleboxes  are    at once an  abomination    (a  violation  of the
+  end-to-end argument)  and a  necessity (for  deploying  higher-level
+  services between  endpoints).  Conventional  techniques  for getting
   middleboxes ``on path'', so called network service chaining, rely on
-  manipulating how  the  network  switches route  traffic.    However,
-  tweaking   the routing  configuration   is clumsy  and  inefficient,
-  especially when middleboxes need session affinity, modify the packet
-  headers, or   serve   mobile endpoints.   Instead,  we   propose  an
-  architecture for   Mobility  and Migration Management   (M2M).   M2M
-  presents a clean separation of data,  control, and management planes
-  for scalable and  flexible policy management  with low overhead.  We
-  introduce a Middlebox-to-Middlebox  (M-to-M) protocol that leverages
-  M2M for dynamic service   chaining.  The M-to-M protocol  deals with
-  middleboxes  as an explicit part  of the end-to-end  path, and adds,
-  removes   or replaces  middleboxes  dynamically as  needed.  We also
-  develop  update algorithms to  address   packet reordering and  race
-  conditions during  a flow migration. Our  high-performance prototype
-  implementation   can  sustain 40  Gbps on   a commodity  server, and
-  establish a session and  manage flow migrations  within the order of
+  manipulating how  the  network  switches  route traffic.    However,
+  tweaking  the  routing  configuration   is clumsy  and  inefficient,
+  especially when middleboxes  need to serve   mobile endpoints or  to
+  support dynamic flow migration.  Instead, we propose an architecture
+  for  Mobility and Migration  Management (M2M).  M2M presents a clean
+  separation of data, control,  and management planes for scalable and
+  flexible policy  management with  low   overhead.  We  introduce   a
+  Middlebox-to-Middlebox   (M-to-M)  protocol that   leverages M2M for
+  dynamic service  chaining.   The     M-to-M protocol   deals    with
+  middleboxes as  an explicit part  of the  end-to-end path, and adds,
+  removes   or replaces middleboxes  dynamically  as  needed.  We also
+  develop update  algorithms to  address  packet reordering  and  race
+  conditions during a  flow migration. Our  high-performance prototype
+  implementation  can sustain 40  Gbps    on a commodity server,   and
+  establish  a session and manage  flow migrations within the order of
   milliseconds.
 
 % With middleboxes and mobility all increasingly the norm, we argue that it is high time to push for a clean, unified solution that solves all of these problems in the right place$(G!7(B the session protocol$(G!7(Brather than the routing system.
