@@ -2,23 +2,22 @@
 
 \subsection{Prototype}
 
-We have  an in-kernel  data  plane  and user  space control/management
-plane via TCP/UDP sockets, with a total of about 4000 lines of code in
-C  and   C++.   There are    three  different options   for  in-kernel
+There are    three  options   for  an in-kernel
 implementation of the data plane: (i) OS  native  network stack; (ii) NIC
 driver (e.g.,  DPDK~\cite{dpdk});   and  (iii)   customized  in-kernel
-software switch (e.g.,  openvswitch~\cite{ovs}).  We choose option (i)
-due to (a) \system has  to choose a  right interface before sending to
-the driver   when  having  multiple  interfaces;  and  (b)  customized
-in-kernel software switch has high overhead.  We use kernel modules to
+software switch (e.g.,  openvswitch~\cite{ovs}).  We chose option (i) because (a) \system has  to choose the  right interface before sending to
+the driver   when  having  multiple  interfaces;  and  (b)  a customized
+in-kernel software switch has high overhead.  We implement  a kernel module data  plane  and user  space control/management
+plane via TCP/UDP sockets, with a total of about 4000 lines of code in
+C  and   C++.   We install kernel modules to
 register callback  functions with  Linux  \texttt{netfilter}  for data
-plane operation. The   control/management  plane  has  an   extensible
-complex control logic, and the data plane does specific simple actions
-(e.g.,  header rewriting, queuing  to packets  user  space and  update
-kernel hash table).  The user and the kernel  agent  communicate via 
+plane operations. The   control/management  plane  has    extensible,
+complex control logic, and the data plane does specific, simpler actions
+such as header rewriting, queuing packets to user  space via \texttt{netfilter\_queue} and  updating the
+kernel hash table, which holds the flow $\rightarrow$ port mapping.  The user and the kernel  agent  communicate via 
 \texttt{netlink}, a native   Linux  Inter Process Communication  (IPC)
 function.  Currently the policy server  is   a simple TCP server  that
-proactively pushes the policies to the agents.
+proactively pushes policies to the agents.
 
 \begin{figure}[ht]
 \centering
@@ -34,19 +33,9 @@ proactively pushes the policies to the agents.
 
 \subsection{Network Function Support}\label{sec:NFsupport}
 
-We categorize NFs into two types --- active and passive functions --- based on whether the NF acts on the original packet. Table~\ref{nfhook} lists several commonly used NFs with the types, key functions to fetch session information and binding libraries. 
+We categorize NFs into two types --- active and passive functions --- based on whether the NF acts on the original packet.  
 
- Many passive NFs get a clone of the original packet and decide based on the copy. As described in \S\ref{sec:arch}, we restore the supersession header of the copy before delivering the packets to NF, so called vertical NAT. Based on Table~\ref{nfhook}, supersession restoring can be realized by extending libpcap~\cite{tcpdump} for a wide range of NFs. 
-
-
-
-For active NFs, if they only act on the payload, supersession restoring also works. 
-However, if the network function acts on the packet 5-tuple, we have to modify NF functions to notify the \system agent its own mapping. 
-For example, a transparent cache proxy~\cite{squid} gets the packets from its listening port and sets up a new TCP socket to the final destination. \system will break the supersession into two if it is unware of the mapping between two sessions. On the other hand, if the NF informs the \system agent the mapping between its listening and sending TCP sockets, the \system agent can stitch the two together ``subsessions'' into one supersession. 
- 
-
-
-\begin{table}[t]\label{middleboxextension} 
+\begin{table}[ht]\label{middleboxextension} 
 \centering
  
 \small
@@ -60,13 +49,23 @@ Bro~\cite{bro} (P)      	  &      IDS               &   DumpPacket()      & libp
 Snort~\cite{snort} (P)  	  &        IDS         &    PQ\_Show()          & libpcap \\ \hline 
 Balance~\cite{balance} (A)	  &      Load Balancer     &    recv(), writen()       &user socket\\ \hline
 Squid~\cite{squid} (A) 	  &        Proxy           &  getsockopt()        & user socket  \\ \hline
-Traffic   		  &    WAN-                &     net\_receive       &Linux  \\ 
+Traffic- 		  &    WAN-                &     net\_receive       &Linux  \\ 
 Squeezer~\cite{tsqueezer} (A)&Optimizer &\_skb()   & skbuff \\ \hline
 
 
 \end{tabular}
-\caption{\small Popular Network Functions; (A) means active, (P) means passive NF. }\label{nfhook}
+\caption{\small Commonly-used Network Functions; (A) means active and (P) means passive NF. }\label{nfhook}
 \end{table}
+
+
+ Many passive NFs make decisions based on a clone of the original packet. Based on our survey in Table~\ref{nfhook}, we found that most passive NFs use libpcap to capture cloned packets from a raw socket. As described in \S\ref{sec:arch}, we must restore the supersession header of the copies before delivering them to the NF. 
+To implement this so-called vertical NAT, we modified the \texttt{pcap\_handle\_packet\_mmap()} function in \texttt{pcap-linux.c} in libpcap~\cite{tcpdump} to restore the supersession. 
+
+For active NFs, there are two cases. If the NFs only act on the payload or MAC layer, e.g.--- TrafficSqueezer, supersession restoring also works. 
+However, if the NF acts on the 5-tuple, we have to extend NF functions to notify the \system agent of its header mapping. 
+For example, a transparent cache proxy~\cite{squid} gets the packets from its listening port and sets up a new TCP socket to the final destination. \system will break the supersession into two if it is unaware of the mapping between two sessions. On the other hand, if the NF informs the \system agent of the mapping between its listening and sending TCP sockets, the \system agent can stitch the two subsessions into the same supersession. 
+ 
+
 
 
 % \subsection{Middlebox Support}
