@@ -18,7 +18,7 @@
 \newcommand{\xmark}{\ding{55}}%
 \makesavenoteenv{tabular}
 \makesavenoteenv{table}
-\newcommand{\system}{\textcolor{magenta}{(MB) }}
+\newcommand{\system}{M2M}
 
 \newcommand{\kelvin}[1]{\textcolor{blue}{(KELVIN: #1)}}
 \newcommand{\amy}[1]{\textcolor{red}{(AT: #1)}}
@@ -35,14 +35,40 @@
 \begin{document}
 
 \maketitle  
-\begin{comment}
 \begin{abstract}
-In addition to delivering data efficiently, today's computer networks often perform services on the traffic in flight to provide new features, enhance security, privacy, or performance. Network administrators frequently install so-called ``middleboxes'' such as firewalls, network address translators, server load balancers, Web caches, and devices that compress or encrypt the traffic. Recent trends of Network Functions Virtualization (NFV) and Software Defined Networks (SDN) turn the network into a fungible pool of resource for running services and steering traffic. Based on a NFV setting, we propose an optimization solution. More specifically, we introduce and study a new class of multi-commodify flow problems where in addition to demands on flows and capacity constraints on edges, there is an additional requirement that flows be processed by middleboxes in the network. 
 
-Current techniques for getting middleboxes ``on path" rely on manipulating how the network switches route traffic. However due to flow session affinity and routing policy conflicts, tweaking the routing configuration to comply with a network is clumsy and inefficient. To achieve the routing solution we obtain from the optimization scheme, we propose a middlebox-aware session protocol (MBP) that makes middleboxes an explicit part of the end-to-end path, and adds, removes or replaces middleboxes dynamically as needed. This approach is easiest to achieve in a cloud environment, where---not coincidentally--the need for scalable NFV is greatest. 
+
+  Middleboxes   are   at once  an   abomination   (a  violation of the
+  end-to-end argument)  and a   necessity (for deploying  higher-level
+  services between  endpoints).   Conventional techniques  for getting
+  middleboxes ``on path'', so called network service chaining, rely on
+  manipulating how  the  network  switches route  traffic.    However,
+  tweaking   the routing  configuration   is clumsy  and  inefficient,
+  especially when middleboxes need session affinity, modify the packet
+  headers, or   serve   mobile endpoints.   Instead,  we   propose  an
+  architecture for   Mobility  and Migration Management   (M2M).   M2M
+  presents a clean separation of data,  control, and management planes
+  for scalable and  flexible policy management  with low overhead.  We
+  introduce a Middlebox-to-Middlebox  (M-to-M) protocol that leverages
+  M2M for dynamic service   chaining.  The M-to-M protocol  deals with
+  middleboxes  as an explicit part  of the end-to-end  path, and adds,
+  removes   or replaces  middleboxes  dynamically as  needed.  We also
+  develop  update algorithms to  address   packet reordering and  race
+  conditions during  a flow migration. Our  high-performance prototype
+  implementation   can  sustain 40  Gbps on   a commodity  server, and
+  establish a session and  manage flow migrations  within the order of
+  milliseconds.
+
+% With middleboxes and mobility all increasingly the norm, we argue that it is high time to push for a clean, unified solution that solves all of these problems in the right place$(G!7(B the session protocol$(G!7(Brather than the routing system.
+
+ 
+%Instead, we propose a middlebox-aware session protocol that makes middleboxes an explicit part of the end-to-end path, and adds or removes middleboxes dynamically as needed. We observe that session-location mobility protocols$(G!7(Bwhich maintain a session across changes in endpoint locations$(G!7(Bnaturally extend to support inserting, removing, and replacing mid- dleboxes. Our protocol enables a mix of signaling and non- signaling middleboxes, and can easily run in a shim layer below TCP for lower overhead and easier deployment. With middleboxes, mobility, and multihoming all increasingly the norm, we argue that it is high time to push for a clean, unified solution that solves all of these problems in the right place$(G!7(B the session protocol$(G!7(Brather than the routing system.
+
+
+% In addition to delivering data efficiently, today's computer networks often perform services on the traffic in flight to provide new features, enhance security, privacy, or performance. Network administrators frequently install so-called ``middleboxes'' such as firewalls, network address translators, server load balancers, Web caches, and devices that compress or encrypt the traffic. Recent trends of Network Functions Virtualization (NFV) and Software Defined Networks (SDN) turn the network into a fungible pool of resource for running services and steering traffic. Based on a NFV setting, we propose an optimization solution. More specifically, we introduce and study a new class of multi-commodify flow problems where in addition to demands on flows and capacity constraints on edges, there is an additional requirement that flows be processed by middleboxes in the network. 
+
+% Current techniques for getting middleboxes ``on path" rely on manipulating how the network switches route traffic. However due to flow session affinity and routing policy conflicts, tweaking the routing configuration to comply with a network is clumsy and inefficient. To achieve the routing solution we obtain from the optimization scheme, we propose a middlebox-aware session protocol (MBP) that makes middleboxes an explicit part of the end-to-end path, and adds, removes or replaces middleboxes dynamically as needed. This approach is easiest to achieve in a cloud environment, where---not coincidentally--the need for scalable NFV is greatest. 
 \end{abstract}
-
-\end{comment}
 
 
 \input{intro.tex}
